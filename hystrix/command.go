@@ -16,23 +16,14 @@ type Command struct {
 	IsFailedExecution      bool
 	IsResponseFromFallback bool
 
-	queueChan chan interface{}
+	fallbacker Fallbacker
+	queueChan  chan interface{}
 }
 
-type RunCommand struct {
-	Command
-
-	runner Runner
-}
-
-func (c *RunCommand) Execute() (interface{}, error) {
-	return c.runner.Run()
-}
-
-func (c *RunCommand) Queue() (chan interface{}, error) {
+func (c *Command) Queue() (chan interface{}, error) {
 	//queue for processing
 	go func() {
-		result, err := c.runner.Run()
+		result, err := c.fallbacker.Run()
 		if err != nil {
 			log.Print(err)
 		}
@@ -42,13 +33,7 @@ func (c *RunCommand) Queue() (chan interface{}, error) {
 	return c.queueChan, nil
 }
 
-type FallbackCommand struct {
-	Command
-
-	fallbacker Fallbacker
-}
-
-func (c *FallbackCommand) Execute() (interface{}, error) {
+func (c *Command) Execute() (interface{}, error) {
 	result, err := c.fallbacker.Run()
 	if err == nil {
 		return result, err
@@ -64,16 +49,9 @@ func (c *FallbackCommand) Execute() (interface{}, error) {
 	return result, nil
 }
 
-func NewRunCommand(groupName string, runner Runner) *RunCommand {
-	return &RunCommand{
-		runner:  runner,
-		Command: Command{queueChan: make(chan interface{})},
-	}
-}
-
-func NewFallbackCommand(groupName string, fallbacker Fallbacker) *FallbackCommand {
-	return &FallbackCommand{
+func NewCommand(groupName string, fallbacker Fallbacker) *Command {
+	return &Command{
 		fallbacker: fallbacker,
-		Command:    Command{queueChan: make(chan interface{})},
+		queueChan:  make(chan interface{}),
 	}
 }

@@ -41,7 +41,7 @@ func TestFallbackCommand(t *testing.T) {
 		customerId:  1234,
 		countryCode: "ca",
 	}
-	c := hystrix.NewFallbackCommand("ExampleGroup", fallbacker)
+	c := hystrix.NewCommand("ExampleGroup", fallbacker)
 	result, err := c.Execute()
 	if err != nil {
 		t.Error("expected err to be nil")

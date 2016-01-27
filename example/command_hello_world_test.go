@@ -15,11 +15,15 @@ func (h helloWorldCommand) Run() (interface{}, error) {
 	return fmt.Sprintf("Hello %s!", h.name), nil
 }
 
+func (h helloWorldCommand) Fallback() (interface{}, error) {
+	return nil, nil
+}
+
 func TestSynchronous(t *testing.T) {
 	helloWorld := helloWorldCommand{name: "World"}
 	helloBob := helloWorldCommand{name: "Bob"}
 
-	c := hystrix.NewRunCommand("ExampleGroup", helloWorld)
+	c := hystrix.NewCommand("ExampleGroup", helloWorld)
 	result, err := c.Execute()
 	if err != nil {
 		t.Error("expected err to be nil")
@@ -32,7 +36,7 @@ func TestSynchronous(t *testing.T) {
 		t.Errorf("expected result to be \"Hello World!\", but got \"%s\"", s)
 	}
 
-	c = hystrix.NewRunCommand("ExampleGroup", helloBob)
+	c = hystrix.NewCommand("ExampleGroup", helloBob)
 	result, err = c.Execute()
 	if err != nil {
 		t.Error("expected err to be nil")
@@ -50,10 +54,10 @@ func TestAsynchronous(t *testing.T) {
 	helloWorld := helloWorldCommand{name: "World"}
 	helloBob := helloWorldCommand{name: "Bob"}
 
-	cmdWorld := hystrix.NewRunCommand("ExampleGroup", helloWorld)
+	cmdWorld := hystrix.NewCommand("ExampleGroup", helloWorld)
 	chanWorld, err := cmdWorld.Queue()
 
-	cmdBob := hystrix.NewRunCommand("ExampleGroup", helloBob)
+	cmdBob := hystrix.NewCommand("ExampleGroup", helloBob)
 	chanBob, err := cmdBob.Queue()
 	if err != nil {
 		t.Error("expected err to be nil")
