@@ -26,6 +26,7 @@ func (c *Command) Queue() (chan interface{}, error) {
 		result, err := c.fallbacker.Run()
 		if err != nil {
 			log.Print(err)
+			result, err = c.fallbacker.Fallback()
 		}
 		c.queueChan <- result
 	}()
