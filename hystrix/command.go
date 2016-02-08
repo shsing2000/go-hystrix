@@ -50,6 +50,10 @@ func (c *Command) Execute() (interface{}, error) {
 	return result, nil
 }
 
+func (c *Command) IsResponseFromCache() bool {
+	return false
+}
+
 func NewCommand(groupName string, fallbacker Fallbacker) *Command {
 	return &Command{
 		fallbacker: fallbacker,
