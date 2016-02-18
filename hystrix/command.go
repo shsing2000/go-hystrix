@@ -13,6 +13,7 @@ type Fallbacker interface {
 
 type Command struct {
 	GroupKey               string
+	CommandKey             string
 	IsFailedExecution      bool
 	IsResponseFromFallback bool
 
